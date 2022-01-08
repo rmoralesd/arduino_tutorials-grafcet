@@ -1,8 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:grafcet/helpers.dart';
+import 'package:grafcet/models/flow_diagram.dart';
 import 'package:grafcet/widgets/widgets.dart';
+import 'package:xml/xml.dart';
 
-class Screen1 extends StatelessWidget {
+class Screen1 extends StatefulWidget {
   const Screen1({Key? key}) : super(key: key);
+
+  @override
+  State<Screen1> createState() => _Screen1State();
+}
+
+class _Screen1State extends State<Screen1> {
+  FlowDiagram? flowChart;
+  void _loadXML() async {
+    XmlDocument xmlDocument = XmlDocument.parse(
+        await rootBundle.loadString('assets/xml/diagram_general.graphml'));
+    flowChart = parseDiagram(xmlDocument);
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadXML();
+  }
 
   @override
   Widget build(BuildContext context) {
