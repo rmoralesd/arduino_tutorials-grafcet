@@ -1,5 +1,6 @@
 class FlowDiagram {
   final List<NodeFlowDiagram> nodes;
+
   FlowDiagram({
     required this.nodes,
   });
@@ -12,5 +13,26 @@ class NodeFlowDiagram {
   final double height;
   final double width;
 
-  NodeFlowDiagram(this.id, this.x, this.y, this.height, this.width);
+  NodeFlowDiagram({
+    required this.id,
+    required this.x,
+    required this.y,
+    required this.height,
+    required this.width,
+  });
+
+  NodeFlowDiagram copyWith({
+    String? id,
+    double? x,
+    double? y,
+    double? height,
+    double? width,
+  }) =>
+      NodeFlowDiagram(
+        id: id ?? this.id,
+        x: x ?? this.x,
+        y: y ?? this.y,
+        height: height ?? this.height,
+        width: width ?? this.width,
+      );
 }
