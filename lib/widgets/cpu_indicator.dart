@@ -17,13 +17,13 @@ class _CpuIndicatorState extends State<CpuIndicator>
 
   AnimationController? controller;
 
-  final Curve curve = Curves.easeInOut;
+  final Curve curve = Curves.linear;
   late Animation<double> animation;
 
   @override
   void initState() {
     controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500));
+        vsync: this, duration: const Duration(milliseconds: 2000));
     animation = CurvedAnimation(parent: controller!, curve: curve);
     controller!.repeat();
     controller!.addListener(() => setState(() {}));
@@ -44,8 +44,7 @@ class _CpuIndicatorState extends State<CpuIndicator>
 
   @override
   Widget build(BuildContext context) {
-    final Offset position =
-        path2.transform(animation.value) - const Offset(525, 115);
+    final Offset position = path2.transform(animation.value);
     return Positioned(
       top: position.dy,
       left: position.dx,

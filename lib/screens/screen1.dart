@@ -23,12 +23,13 @@ class _Screen1State extends State<Screen1> {
 
   @override
   void initState() {
-    super.initState();
     _loadXML();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    //print(flowChart!.nodes);
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -49,14 +50,13 @@ class _Screen1State extends State<Screen1> {
                   Image.asset(
                     'assets/images/diagrama_general.png',
                   ),
-                  const CpuIndicator(
-                    path: <Offset>[
-                      Offset(1028, 138),
-                      Offset(1028, 420),
-                      Offset(800, 420),
-                      Offset(800, 138),
-                    ],
-                  )
+                  flowChart != null
+                      ? CpuIndicator(
+                          path: flowChart!.nodes
+                              .map((e) => Offset(e.x, e.y))
+                              .toList(),
+                        )
+                      : const CircularProgressIndicator()
                 ],
               )
             ],
