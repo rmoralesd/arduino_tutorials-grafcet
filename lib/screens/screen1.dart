@@ -52,6 +52,7 @@ class _Screen1State extends State<Screen1> {
                   ),
                   flowChart != null
                       ? CpuIndicator(
+                          voidLoopIndex: 4,
                           path: flowChart!.nodes
                               .map((e) => Offset(e.x, e.y))
                               .toList(),
