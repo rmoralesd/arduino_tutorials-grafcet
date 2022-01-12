@@ -14,6 +14,7 @@ class Screen1 extends StatefulWidget {
 
 class _Screen1State extends State<Screen1> {
   FlowDiagram? flowChart;
+  bool isPlaying = false;
   void _loadXML() async {
     XmlDocument xmlDocument = XmlDocument.parse(
         await rootBundle.loadString('assets/xml/diagram_general.graphml'));
@@ -29,11 +30,29 @@ class _Screen1State extends State<Screen1> {
 
   @override
   Widget build(BuildContext context) {
+    final cpuIndicator = flowChart != null
+        ? CpuIndicator(
+            voidLoopIndex: 4,
+            path: flowChart!.nodes.map((e) => Offset(e.x, e.y)).toList(),
+            isPlaying: isPlaying,
+          )
+        : const CircularProgressIndicator();
     //print(flowChart!.nodes);
     return Scaffold(
       appBar: AppBar(
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.navigate_before)),
+          IconButton(
+            onPressed: () {
+              if (cpuIndicator is CpuIndicator) {
+                isPlaying = !isPlaying;
+                setState(() {});
+              }
+            },
+            icon: isPlaying
+                ? const Icon(Icons.pause)
+                : const Icon(Icons.play_arrow),
+          ),
           IconButton(
               onPressed: () {}, icon: const Icon(Icons.navigate_next_outlined)),
         ],
@@ -50,14 +69,7 @@ class _Screen1State extends State<Screen1> {
                   Image.asset(
                     'assets/images/diagrama_general.png',
                   ),
-                  flowChart != null
-                      ? CpuIndicator(
-                          voidLoopIndex: 4,
-                          path: flowChart!.nodes
-                              .map((e) => Offset(e.x, e.y))
-                              .toList(),
-                        )
-                      : const CircularProgressIndicator()
+                  cpuIndicator
                 ],
               )
             ],

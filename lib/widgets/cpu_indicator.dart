@@ -3,14 +3,18 @@ import 'package:flutter/material.dart';
 class CpuIndicator extends StatefulWidget {
   final List<Offset> path;
   final int voidLoopIndex;
-  const CpuIndicator({
-    Key? key,
-    required this.path,
-    this.voidLoopIndex = 0,
-  }) : super(key: key);
+  final bool isPlaying;
+  const CpuIndicator(
+      {Key? key,
+      required this.path,
+      this.voidLoopIndex = 0,
+      this.isPlaying = true})
+      : super(key: key);
 
   @override
   State<CpuIndicator> createState() => _CpuIndicatorState();
+
+  void stop() {}
 }
 
 class _CpuIndicatorState extends State<CpuIndicator>
@@ -25,20 +29,20 @@ class _CpuIndicatorState extends State<CpuIndicator>
 
   @override
   void initState() {
+    _initialValues();
+    super.initState();
+  }
+
+  void _initialValues() {
     controller = AnimationController(
         vsync: this,
         duration: Duration(milliseconds: widget.path.length * 200));
     animation = CurvedAnimation(parent: controller!, curve: curve);
-    controller!.forward();
     path2 = CatmullRomSpline(
       widget.path,
       startHandle: const Offset(0.93, 0.93),
       endHandle: const Offset(0.18, 0.23),
     );
-    controller!.addListener(() => setState(() {}));
-    controller!.addStatusListener(_setToLoop);
-
-    super.initState();
   }
 
   void _setToLoop(status) {
@@ -64,6 +68,7 @@ class _CpuIndicatorState extends State<CpuIndicator>
 
   @override
   Widget build(BuildContext context) {
+    _prepareController();
     final Offset position = path2.transform(animation.value);
     return Positioned(
       top: position.dy,
@@ -74,5 +79,23 @@ class _CpuIndicatorState extends State<CpuIndicator>
         height: 50,
       ),
     );
+  }
+
+  void _prepareController() {
+    if (widget.isPlaying) {
+      if (isFirstRun) {
+        controller!.addListener(() {
+          setState(() {});
+        });
+        controller!.addStatusListener((status) {
+          _setToLoop(status);
+        });
+        controller!.forward();
+      } else {
+        controller!.repeat();
+      }
+    } else if (!widget.isPlaying) {
+      controller!.stop();
+    }
   }
 }
