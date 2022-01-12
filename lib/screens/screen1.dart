@@ -15,6 +15,7 @@ class Screen1 extends StatefulWidget {
 class _Screen1State extends State<Screen1> {
   FlowDiagram? flowChart;
   bool isPlaying = false;
+  bool resetAnimation = false;
   void _loadXML() async {
     XmlDocument xmlDocument = XmlDocument.parse(
         await rootBundle.loadString('assets/xml/diagram_general.graphml'));
@@ -35,6 +36,7 @@ class _Screen1State extends State<Screen1> {
             voidLoopIndex: 4,
             path: flowChart!.nodes.map((e) => Offset(e.x, e.y)).toList(),
             isPlaying: isPlaying,
+            reset: resetAnimation,
           )
         : const CircularProgressIndicator();
     //print(flowChart!.nodes);
@@ -43,9 +45,19 @@ class _Screen1State extends State<Screen1> {
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.navigate_before)),
           IconButton(
+              onPressed: () {
+                if (cpuIndicator is CpuIndicator) {
+                  isPlaying = false;
+                  resetAnimation = true;
+                  setState(() {});
+                }
+              },
+              icon: const Icon(Icons.stop)),
+          IconButton(
             onPressed: () {
               if (cpuIndicator is CpuIndicator) {
                 isPlaying = !isPlaying;
+                resetAnimation = false;
                 setState(() {});
               }
             },
@@ -58,11 +70,13 @@ class _Screen1State extends State<Screen1> {
         ],
       ),
       body: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const SizedBox(
             width: 50,
           ),
           Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Stack(
                 children: [

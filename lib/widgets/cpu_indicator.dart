@@ -4,11 +4,13 @@ class CpuIndicator extends StatefulWidget {
   final List<Offset> path;
   final int voidLoopIndex;
   final bool isPlaying;
+  final bool reset;
   const CpuIndicator(
       {Key? key,
       required this.path,
       this.voidLoopIndex = 0,
-      this.isPlaying = true})
+      this.isPlaying = true,
+      this.reset = false})
       : super(key: key);
 
   @override
@@ -52,7 +54,8 @@ class _CpuIndicatorState extends State<CpuIndicator>
       controller!.duration = Duration(milliseconds: pathLoop.length * 200);
       controller!.repeat();
       path2 = CatmullRomSpline(
-        isFirstRun ? widget.path : pathLoop,
+        //isFirstRun ? widget.path : pathLoop,
+        pathLoop,
         startHandle: const Offset(0.93, 0.93),
         endHandle: const Offset(0.18, 0.23),
       );
@@ -82,6 +85,17 @@ class _CpuIndicatorState extends State<CpuIndicator>
   }
 
   void _prepareController() {
+    if (widget.reset) {
+      path2 = CatmullRomSpline(
+        widget.path,
+        startHandle: const Offset(0.93, 0.93),
+        endHandle: const Offset(0.18, 0.23),
+      );
+      controller!.duration = Duration(milliseconds: widget.path.length * 200);
+      isFirstRun = true;
+      controller!.reset();
+      return;
+    }
     if (widget.isPlaying) {
       if (isFirstRun) {
         controller!.addListener(() {
