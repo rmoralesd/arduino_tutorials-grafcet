@@ -78,6 +78,13 @@ class _Screen1State extends State<Screen1> {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              const Text(
+                'Esquema general de funcionamiento',
+                style: TextStyle(fontSize: 64),
+              ),
+              const SizedBox(
+                height: 100,
+              ),
               Stack(
                 children: [
                   Image.asset(
