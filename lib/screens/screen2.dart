@@ -6,14 +6,14 @@ import 'package:grafcet/widgets/controls.dart';
 import 'package:grafcet/widgets/widgets.dart';
 import 'package:xml/xml.dart';
 
-class Screen1 extends StatefulWidget {
-  const Screen1({Key? key}) : super(key: key);
+class Screen2 extends StatefulWidget {
+  const Screen2({Key? key}) : super(key: key);
 
   @override
-  State<Screen1> createState() => _Screen1State();
+  State<Screen2> createState() => _Screen2State();
 }
 
-class _Screen1State extends State<Screen1> {
+class _Screen2State extends State<Screen2> {
   FlowDiagram? flowChart;
   bool isPlaying = false;
   bool resetAnimation = false;
@@ -40,9 +40,10 @@ class _Screen1State extends State<Screen1> {
             reset: resetAnimation,
           )
         : const CircularProgressIndicator();
+    //print(flowChart!.nodes);
     return Scaffold(
+      backgroundColor: Colors.red,
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           ControlsBar(
             isPlaying: isPlaying,
@@ -56,52 +57,39 @@ class _Screen1State extends State<Screen1> {
               resetAnimation = true;
               setState(() {});
             },
-            OnGoNext: () => Navigator.pushNamed(context, 'screen2'),
+            OnGoPrevious: () => Navigator.pop(context),
+            //OnGoNext: () => Navigator.pushReplacementNamed(context, 'screen2'),
           ),
-          _BuildContent(cpuIndicator: cpuIndicator),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(
+                width: 50,
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Esquema general de funcionamiento',
+                    style: TextStyle(fontSize: 64),
+                  ),
+                  const SizedBox(
+                    height: 100,
+                  ),
+                  Stack(
+                    children: [
+                      Image.asset(
+                        'assets/images/diagrama_general.png',
+                      ),
+                      cpuIndicator
+                    ],
+                  )
+                ],
+              )
+            ],
+          ),
         ],
       ),
-    );
-  }
-}
-
-class _BuildContent extends StatelessWidget {
-  const _BuildContent({
-    Key? key,
-    required this.cpuIndicator,
-  }) : super(key: key);
-
-  final StatefulWidget cpuIndicator;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const SizedBox(
-          width: 50,
-        ),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Esquema general de funcionamiento',
-              style: TextStyle(fontSize: 64),
-            ),
-            const SizedBox(
-              height: 100,
-            ),
-            Stack(
-              children: [
-                Image.asset(
-                  'assets/images/diagrama_general.png',
-                ),
-                cpuIndicator
-              ],
-            )
-          ],
-        )
-      ],
     );
   }
 }
