@@ -32,6 +32,31 @@ void main() {
       expect(flowDiagram.nodes.firstWhere((element) => element.y == 0),
           isA<NodeFlowDiagram>());
     });
+
+    test('parseDiagram, aplica escala a la geometria del nodo)', () {
+      var scale = 2.0;
+      var flowDiagram2 = parseDiagram(testDoc, scale: scale);
+      bool isDouble = true;
+      for (var item in flowDiagram.nodes) {
+        var xisequal = (item.x * scale) ==
+            flowDiagram2.nodes.firstWhere((element) => element.id == item.id).x;
+        var yisequal = item.y * scale ==
+            flowDiagram2.nodes.firstWhere((element) => element.id == item.id).y;
+        var heightisequal = item.height * scale ==
+            flowDiagram2.nodes
+                .firstWhere((element) => element.id == item.id)
+                .height;
+        var widthisequal = item.width * scale ==
+            flowDiagram2.nodes
+                .firstWhere((element) => element.id == item.id)
+                .width;
+        if (!xisequal || !yisequal || !heightisequal || !widthisequal) {
+          isDouble = false;
+          break;
+        }
+      }
+      expect(isDouble, true);
+    });
   });
 
   group('parseDiagram con doble data key en los nodos', () {
