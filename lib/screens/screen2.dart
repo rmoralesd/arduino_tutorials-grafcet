@@ -17,10 +17,11 @@ class _Screen2State extends State<Screen2> {
   FlowDiagram? flowChart;
   bool isPlaying = false;
   bool resetAnimation = false;
+  bool condition = false;
   void _loadXML() async {
-    XmlDocument xmlDocument = XmlDocument.parse(
-        await rootBundle.loadString('assets/xml/diagram_general.graphml'));
-    flowChart = parseDiagram(xmlDocument);
+    XmlDocument xmlDocument = XmlDocument.parse(await rootBundle
+        .loadString('assets/xml/generalidades_grafcet_ard.graphml'));
+    flowChart = parseDiagram(xmlDocument, scale: 1.25);
     setState(() {});
   }
 
@@ -30,19 +31,51 @@ class _Screen2State extends State<Screen2> {
     super.initState();
   }
 
+  List<Offset> buildOffsets(FlowDiagram diagram, List<String> nodesId) {
+    List<Offset> offsets = [];
+    for (var id in nodesId) {
+      var node = diagram.nodes.firstWhere((element) => element.id == id);
+      offsets.add(Offset(node.x, node.y));
+    }
+
+    return offsets;
+  }
+
   @override
   Widget build(BuildContext context) {
+    print('rebuild, condition=$condition');
+    late List<String> path;
+    if (!condition) {
+      path = [
+        "n5",
+        "n2",
+        "n3",
+        "n4",
+        "n6",
+        "n7",
+        "n8",
+        "n9",
+        "n10",
+        "n11",
+        "n13",
+        "n17",
+        "n18",
+        "n19",
+        "n21"
+      ];
+    } else {
+      path = ["n5", "n2", "n3", "n4", "n6", "n7", "n8", "n9", "n19", "n21"];
+    }
     final cpuIndicator = flowChart != null
         ? CpuIndicator(
             voidLoopIndex: 4,
-            path: flowChart!.nodes.map((e) => Offset(e.x, e.y)).toList(),
+            path: buildOffsets(flowChart!, path),
             isPlaying: isPlaying,
             reset: resetAnimation,
           )
         : const CircularProgressIndicator();
     //print(flowChart!.nodes);
     return Scaffold(
-      backgroundColor: Colors.red,
       body: Column(
         children: [
           ControlsBar(
@@ -60,36 +93,57 @@ class _Screen2State extends State<Screen2> {
             OnGoPrevious: () => Navigator.pop(context),
             //OnGoNext: () => Navigator.pushReplacementNamed(context, 'screen2'),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(
-                width: 50,
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Esquema general de funcionamiento',
-                    style: TextStyle(fontSize: 64),
-                  ),
-                  const SizedBox(
-                    height: 100,
-                  ),
-                  Stack(
-                    children: [
-                      Image.asset(
-                        'assets/images/diagrama_general.png',
-                      ),
-                      cpuIndicator
-                    ],
-                  )
-                ],
-              )
-            ],
-          ),
+          _buildContent(cpuIndicator),
+          MaterialButton(
+            onPressed: () {
+              condition = !condition;
+              setState(() {});
+            },
+            child: const Text('Set condition'),
+          )
         ],
       ),
+    );
+  }
+
+  Row _buildContent(StatefulWidget cpuIndicator) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const SizedBox(
+          width: 50,
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Generalidades del Grafcet',
+              style: TextStyle(fontSize: 64),
+            ),
+            const SizedBox(
+              height: 100,
+            ),
+            Row(
+              children: [
+                Image.asset(
+                  'assets/images/generalidades_grafcet.png',
+                ),
+                Container(
+                  color: Colors.black,
+                  width: 10,
+                  height: 500,
+                ),
+                Stack(
+                  children: [
+                    Image.asset('assets/images/generalidades_grafcet_ard.png'),
+                    cpuIndicator
+                  ],
+                ),
+              ],
+            )
+          ],
+        )
+      ],
     );
   }
 }
