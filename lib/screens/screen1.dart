@@ -32,14 +32,6 @@ class _Screen1State extends State<Screen1> {
 
   @override
   Widget build(BuildContext context) {
-    final cpuIndicator = flowChart != null
-        ? CpuIndicator(
-            voidLoopIndex: 4,
-            path: flowChart!.nodes.map((e) => Offset(e.x, e.y)).toList(),
-            isPlaying: isPlaying,
-            reset: resetAnimation,
-          )
-        : const CircularProgressIndicator();
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -58,50 +50,10 @@ class _Screen1State extends State<Screen1> {
             },
             OnGoNext: () => Navigator.pushNamed(context, 'screen2'),
           ),
-          _BuildContent(cpuIndicator: cpuIndicator),
+
+          //_BuildContent(cpuIndicator: cpuIndicator),
         ],
       ),
-    );
-  }
-}
-
-class _BuildContent extends StatelessWidget {
-  const _BuildContent({
-    Key? key,
-    required this.cpuIndicator,
-  }) : super(key: key);
-
-  final StatefulWidget cpuIndicator;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const SizedBox(
-          width: 50,
-        ),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Esquema general de funcionamiento',
-              style: TextStyle(fontSize: 64),
-            ),
-            const SizedBox(
-              height: 100,
-            ),
-            Stack(
-              children: [
-                Image.asset(
-                  'assets/images/diagrama_general.png',
-                ),
-                cpuIndicator
-              ],
-            )
-          ],
-        )
-      ],
     );
   }
 }
