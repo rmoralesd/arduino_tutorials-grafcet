@@ -28,6 +28,7 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
 
     on<TimerTicked>((event, emit) {
       emit(TimerRunInProgress(event.currentMilliseconds));
+      //print('ticked')
     });
 
     on<TimerPaused>((event, emit) {
