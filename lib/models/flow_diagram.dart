@@ -35,4 +35,10 @@ class NodeFlowDiagram {
         height: height ?? this.height,
         width: width ?? this.width,
       );
+
+  @override
+  String toString() {
+    String result = 'Id=$id,x=$x,y=$y,width=$width,height=$height';
+    return result;
+  }
 }

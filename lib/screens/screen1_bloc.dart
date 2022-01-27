@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:grafcet/blocs/timer_bloc/timer_bloc.dart';
 import 'package:grafcet/models/ticker.dart';
 import 'package:grafcet/widgets/controls.dart';
+import 'package:grafcet/widgets/diagrama_general_widget.dart';
 
 class Screen1Bloc extends StatelessWidget {
   const Screen1Bloc({Key? key}) : super(key: key);
@@ -25,7 +26,8 @@ class Screen1Content extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: const [
-          Actions(),
+          ControlsBar(),
+          //Actions(),
           Screen1Body(),
         ],
       ),
@@ -48,7 +50,13 @@ class Actions extends StatelessWidget {
                   child: const Icon(Icons.play_arrow),
                   onPressed: () => context
                       .read<TimerBloc>()
-                      .add(const TimerStarted(millisecondsStep: 10)))
+                      .add(const TimerStarted(millisecondsStep: 100)))
+            ],
+            if (state is TimerRunInProgress) ...[
+              FloatingActionButton(
+                  child: const Icon(Icons.pause),
+                  onPressed: () => context.read<TimerBloc>().add(TimerPaused(
+                      currentMilliseconds: state.currentMilliseconds)))
             ]
           ],
         );
@@ -64,8 +72,26 @@ class Screen1Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentMillis =
-        context.select((TimerBloc bloc) => bloc.state.currentMilliseconds);
-    return Text(currentMillis.toString());
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const SizedBox(
+          width: 50,
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Esquema general de funcionamiento',
+              style: Theme.of(context).textTheme.headline1,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            const DiagramaGeneral()
+          ],
+        )
+      ],
+    );
   }
 }

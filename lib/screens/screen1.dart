@@ -36,20 +36,20 @@ class _Screen1State extends State<Screen1> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          ControlsBar(
-            isPlaying: isPlaying,
-            OnPlayPause: () {
-              isPlaying = !isPlaying;
-              resetAnimation = false;
-              setState(() {});
-            },
-            OnStop: () {
-              isPlaying = false;
-              resetAnimation = true;
-              setState(() {});
-            },
-            OnGoNext: () => Navigator.pushNamed(context, 'screen2'),
-          ),
+          // ControlsBar(
+          //   isPlaying: isPlaying,
+          //   onPlayPause: () {
+          //     isPlaying = !isPlaying;
+          //     resetAnimation = false;
+          //     setState(() {});
+          //   },
+          //   onStop: () {
+          //     isPlaying = false;
+          //     resetAnimation = true;
+          //     setState(() {});
+          //   },
+          //   onGoNext: () => Navigator.pushNamed(context, 'screen2'),
+          // ),
 
           //_BuildContent(cpuIndicator: cpuIndicator),
         ],

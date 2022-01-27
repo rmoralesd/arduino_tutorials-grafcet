@@ -66,33 +66,26 @@ class _Screen2State extends State<Screen2> {
     } else {
       path = ["n5", "n2", "n3", "n4", "n6", "n7", "n8", "n9", "n19", "n21"];
     }
-    final cpuIndicator = flowChart != null
-        ? CpuIndicator(
-            voidLoopIndex: 4,
-            path: buildOffsets(flowChart!, path),
-            isPlaying: isPlaying,
-            reset: resetAnimation,
-          )
-        : const CircularProgressIndicator();
+    final cpuIndicator = const CircularProgressIndicator();
     //print(flowChart!.nodes);
     return Scaffold(
       body: Column(
         children: [
-          ControlsBar(
-            isPlaying: isPlaying,
-            OnPlayPause: () {
-              isPlaying = !isPlaying;
-              resetAnimation = false;
-              setState(() {});
-            },
-            OnStop: () {
-              isPlaying = false;
-              resetAnimation = true;
-              setState(() {});
-            },
-            OnGoPrevious: () => Navigator.pop(context),
-            //OnGoNext: () => Navigator.pushReplacementNamed(context, 'screen2'),
-          ),
+          // ControlsBar(
+          //   isPlaying: isPlaying,
+          //   onPlayPause: () {
+          //     isPlaying = !isPlaying;
+          //     resetAnimation = false;
+          //     setState(() {});
+          //   },
+          //   onStop: () {
+          //     isPlaying = false;
+          //     resetAnimation = true;
+          //     setState(() {});
+          //   },
+          //   onGoPrevious: () => Navigator.pop(context),
+          //   //OnGoNext: () => Navigator.pushReplacementNamed(context, 'screen2'),
+          // ),
           _buildContent(cpuIndicator),
           MaterialButton(
             onPressed: () {
