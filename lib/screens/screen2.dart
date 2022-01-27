@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:grafcet/blocs/timer_bloc/timer_bloc.dart';
 import 'package:grafcet/helpers.dart';
 import 'package:grafcet/models/flow_diagram.dart';
+import 'package:grafcet/models/ticker.dart';
 import 'package:grafcet/widgets/controls.dart';
 import 'package:grafcet/widgets/widgets.dart';
 import 'package:xml/xml.dart';
@@ -66,37 +69,26 @@ class _Screen2State extends State<Screen2> {
     } else {
       path = ["n5", "n2", "n3", "n4", "n6", "n7", "n8", "n9", "n19", "n21"];
     }
-    final cpuIndicator = const CircularProgressIndicator();
-    //print(flowChart!.nodes);
-    return Scaffold(
-      body: Column(
-        children: [
-          // ControlsBar(
-          //   isPlaying: isPlaying,
-          //   onPlayPause: () {
-          //     isPlaying = !isPlaying;
-          //     resetAnimation = false;
-          //     setState(() {});
-          //   },
-          //   onStop: () {
-          //     isPlaying = false;
-          //     resetAnimation = true;
-          //     setState(() {});
-          //   },
-          //   onGoPrevious: () => Navigator.pop(context),
-          //   //OnGoNext: () => Navigator.pushReplacementNamed(context, 'screen2'),
-          // ),
-          _buildContent(cpuIndicator),
-          MaterialButton(
-            onPressed: () {
-              condition = !condition;
-              setState(() {});
-            },
-            child: const Text('Set condition'),
-          )
-        ],
-      ),
-    );
+
+    return BlocProvider(
+        create: (_) => TimerBloc(ticker: const Ticker()),
+        child: Scaffold(
+          body: Column(
+            children: [
+              ControlsBar(
+                onGoPrevious: () => Navigator.pop(context),
+              ),
+              //_buildContent(cpuIndicator),
+              MaterialButton(
+                onPressed: () {
+                  condition = !condition;
+                  setState(() {});
+                },
+                child: const Text('Set condition'),
+              )
+            ],
+          ),
+        ));
   }
 
   Row _buildContent(StatefulWidget cpuIndicator) {
