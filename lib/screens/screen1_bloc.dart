@@ -25,42 +25,13 @@ class Screen1Content extends StatelessWidget {
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: const [
-          ControlsBar(),
-          //Actions(),
-          Screen1Body(),
+        children: [
+          ControlsBar(
+            onGoNext: () => Navigator.pushNamed(context, 'screen2'),
+          ),
+          const Screen1Body(),
         ],
       ),
-    );
-  }
-}
-
-class Actions extends StatelessWidget {
-  const Actions({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<TimerBloc, TimerState>(
-      builder: (context, state) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            if (state is TimerInitial) ...[
-              FloatingActionButton(
-                  child: const Icon(Icons.play_arrow),
-                  onPressed: () => context
-                      .read<TimerBloc>()
-                      .add(const TimerStarted(millisecondsStep: 100)))
-            ],
-            if (state is TimerRunInProgress) ...[
-              FloatingActionButton(
-                  child: const Icon(Icons.pause),
-                  onPressed: () => context.read<TimerBloc>().add(TimerPaused(
-                      currentMilliseconds: state.currentMilliseconds)))
-            ]
-          ],
-        );
-      },
     );
   }
 }

@@ -5,15 +5,11 @@ import 'package:grafcet/blocs/timer_bloc/timer_bloc.dart';
 class ControlsBar extends StatelessWidget {
   final Function()? onGoPrevious;
   final Function()? onGoNext;
-  final Function()? onStop;
-  final Function()? onPlayPause;
 
   const ControlsBar({
     Key? key,
     this.onGoPrevious,
     this.onGoNext,
-    this.onStop,
-    this.onPlayPause,
   }) : super(key: key);
 
   @override

@@ -12,9 +12,6 @@ import 'package:grafcet/blocs/timer_bloc/timer_bloc.dart';
 
 class DiagramaGeneral extends StatefulWidget {
   const DiagramaGeneral({Key? key}) : super(key: key);
-
-  void f() {}
-
   @override
   _DiagramaGeneralState createState() => _DiagramaGeneralState();
 }
@@ -25,7 +22,7 @@ class _DiagramaGeneralState extends State<DiagramaGeneral> {
   void _loadXML() async {
     XmlDocument xmlDocument = XmlDocument.parse(
         await rootBundle.loadString('assets/xml/diagram_general.graphml'));
-    flowChart = parseDiagram(xmlDocument, scale: 1.0);
+    flowChart = parseDiagram(xmlDocument, scale: 2.0);
     setState(() {});
   }
 
