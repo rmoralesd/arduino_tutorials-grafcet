@@ -5,8 +5,10 @@ import 'package:grafcet/blocs/timer_bloc/timer_bloc.dart';
 import 'package:grafcet/helpers.dart';
 import 'package:grafcet/models/models.dart';
 import 'package:grafcet/models/ticker.dart';
+import 'package:grafcet/models/vars.dart';
 import 'package:grafcet/widgets/controls.dart';
 import 'package:grafcet/widgets/cpu_indicator.dart';
+import 'package:provider/provider.dart';
 import 'package:xml/xml.dart';
 
 class Screen2Bloc extends StatelessWidget {
@@ -15,23 +17,27 @@ class Screen2Bloc extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (_) => TimerBloc(ticker: const Ticker()),
-        )
-      ],
-      child: Scaffold(
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            ControlsBar(
-              onGoNext: () => Navigator.pushNamed(context, 'screen2'),
+        providers: [
+          BlocProvider(
+            create: (_) => TimerBloc(ticker: const Ticker()),
+          )
+        ],
+        child: Provider<Variables>(
+          create: (_) => Variables()
+            ..appendVar('condition', false)
+            ..appendVar('etapa', 0),
+          child: Scaffold(
+            body: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                ControlsBar(
+                  onGoNext: () => Navigator.pushNamed(context, 'screen2'),
+                ),
+                const Screen2Body(),
+              ],
             ),
-            const Screen2Body(),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 }
 
@@ -40,6 +46,7 @@ class Screen2Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final vars = context.read<Variables>().list;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -60,11 +67,38 @@ class Screen2Body extends StatelessWidget {
               width: 10,
               height: 500,
             ),
-            const _DiagramaArd()
+            const _DiagramaArd(),
           ],
-        )
+        ),
+        ButtonCondition(vars: vars)
       ],
     );
+  }
+}
+
+class ButtonCondition extends StatefulWidget {
+  const ButtonCondition({
+    Key? key,
+    required this.vars,
+  }) : super(key: key);
+
+  final Map<String, dynamic> vars;
+
+  @override
+  State<ButtonCondition> createState() => _ButtonConditionState();
+}
+
+class _ButtonConditionState extends State<ButtonCondition> {
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+        onPressed: () {
+          widget.vars['condition'] = !widget.vars['condition'];
+          setState(() {});
+        },
+        style: ElevatedButton.styleFrom(
+            primary: widget.vars['condition'] ? Colors.green[500] : Colors.red),
+        child: Text('Condicion = ${widget.vars['condition']}'));
   }
 }
 
@@ -106,14 +140,19 @@ class __DiagramaArdState extends State<_DiagramaArd> {
         case 4:
           currentNodeIndex = 6;
           break;
-        case 6:
+        case 6: //void Loop
           currentNodeIndex = 7;
+
           break;
-        case 7:
+        case 7: //Entradas
           currentNodeIndex = 8;
           break;
         case 8:
-          currentNodeIndex = 9;
+          if (context.read<Variables>().list["etapa"] == 0) {
+            currentNodeIndex = 9;
+          } else {
+            currentNodeIndex = 14;
+          }
           break;
         case 9:
           currentNodeIndex = 10;
@@ -122,9 +161,22 @@ class __DiagramaArdState extends State<_DiagramaArd> {
           currentNodeIndex = 11;
           break;
         case 11:
-          currentNodeIndex = 13;
+          if (context.read<Variables>().list["condition"]) {
+            currentNodeIndex = 12;
+          } else {
+            currentNodeIndex = 13;
+          }
+          break;
+        case 12:
+          currentNodeIndex = 20;
           break;
         case 13:
+          currentNodeIndex = 19;
+          break;
+        case 14:
+          currentNodeIndex = 15;
+          break;
+        case 15:
           currentNodeIndex = 19;
           break;
         case 17:
@@ -133,10 +185,14 @@ class __DiagramaArdState extends State<_DiagramaArd> {
         case 18:
           currentNodeIndex = 19;
           break;
-        case 19:
+        case 19: //Salidas
           currentNodeIndex = 21;
           break;
-        case 21:
+        case 20: //Etapa=1
+          context.read<Variables>().list["etapa"] = 1;
+          currentNodeIndex = 13;
+          break;
+        case 21: //Fin
           currentNodeIndex = 6;
           break;
       }
@@ -150,8 +206,10 @@ class __DiagramaArdState extends State<_DiagramaArd> {
     return BlocListener<TimerBloc, TimerState>(
         listener: (previous, current) {
           if (current is TimerInitial) {
-            currentNodeIndex = -1;
+            currentNodeIndex = 5;
             setState(() {});
+            context.read<Variables>().list['condition'] = false;
+            context.read<Variables>().list['etapa'] = 0;
           }
         },
         child: Stack(

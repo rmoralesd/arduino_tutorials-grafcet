@@ -32,7 +32,7 @@ class ControlsBar extends StatelessWidget {
                   if (state is TimerInitial) {
                     context
                         .read<TimerBloc>()
-                        .add(const TimerStarted(millisecondsStep: 100));
+                        .add(const TimerStarted(millisecondsStep: 200));
                   } else if (state is TimerRunInPause) {
                     context.read<TimerBloc>().add(TimerResumed(
                         currentMilliseconds: state.currentMilliseconds));
