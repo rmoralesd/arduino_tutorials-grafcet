@@ -59,9 +59,10 @@ class Screen2Body extends StatelessWidget {
         ),
         Row(
           children: [
-            Image.asset(
-              'assets/images/generalidades_grafcet.png',
-            ),
+            // Image.asset(
+            //   'assets/images/generalidades_grafcet.png',
+            // ),
+            const _DiagramaGraph(),
             Container(
               color: Colors.black,
               width: 10,
@@ -97,8 +98,68 @@ class _ButtonConditionState extends State<ButtonCondition> {
           setState(() {});
         },
         style: ElevatedButton.styleFrom(
+            textStyle:
+                Theme.of(context).textTheme.button!.copyWith(fontSize: 40),
             primary: widget.vars['condition'] ? Colors.green[500] : Colors.red),
         child: Text('Condicion = ${widget.vars['condition']}'));
+  }
+}
+
+class _DiagramaGraph extends StatefulWidget {
+  const _DiagramaGraph({Key? key}) : super(key: key);
+
+  @override
+  __DiagramaGraphState createState() => __DiagramaGraphState();
+}
+
+class __DiagramaGraphState extends State<_DiagramaGraph> {
+  FlowDiagram? flowChart;
+  int currentNodeIndex = 1;
+  void _loadXML() async {
+    XmlDocument xmlDocument = XmlDocument.parse(await rootBundle
+        .loadString('assets/xml/generalidades_grafcet.graphml'));
+    flowChart = parseDiagram(xmlDocument, scale: 2);
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    _loadXML();
+    super.initState();
+  }
+
+  NodeFlowDiagram? getNextNode() {
+    switch (context.read<Variables>().list['etapa']) {
+      case 0:
+        currentNodeIndex = 1;
+        break;
+      case 1:
+        currentNodeIndex = 4;
+        break;
+    }
+    return flowChart?.nodes[currentNodeIndex];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<TimerBloc, TimerState>(
+        listener: (previous, current) {
+          if (current is TimerInitial) {
+            currentNodeIndex = 5;
+            setState(() {});
+            context.read<Variables>().list['condition'] = false;
+            context.read<Variables>().list['etapa'] = 0;
+          }
+        },
+        child: Stack(
+          children: [
+            Image.asset('assets/images/generalidades_grafcet.png'),
+            CPUIndicator(
+              getNextNode: getNextNode,
+              cpuIndicatorType: CPUIndicatorType.robot,
+            )
+          ],
+        ));
   }
 }
 
