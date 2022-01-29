@@ -50,7 +50,7 @@ class CPUIndicatorState extends State<CPUIndicator> {
       if (points.length > 4) points.removeAt(0);
     }
 
-    return Container(
+    return SizedBox(
       width: widget.width,
       height: widget.height,
       child: Stack(
@@ -87,14 +87,8 @@ class PathPainter extends CustomPainter {
       ..color = const Color.fromARGB(100, 0, 255, 0)
       ..strokeWidth = 8
       ..strokeCap = StrokeCap.round;
-    if (points.length >= 2) {
-      canvas.drawLine(points[0], points[1], paint);
-    }
-    if (points.length >= 3) {
-      canvas.drawLine(points[1], points[2], paint);
-    }
-    if (points.length >= 4) {
-      canvas.drawLine(points[2], points[3], paint);
+    for (int i = 1; i < points.length; i++) {
+      canvas.drawLine(points[i - 1], points[i], paint);
     }
   }
 
