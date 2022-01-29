@@ -24,8 +24,9 @@ class Screen2Bloc extends StatelessWidget {
         ],
         child: Provider<Variables>(
           create: (_) => Variables()
-            ..appendVar('condition', false)
-            ..appendVar('etapa', 0),
+            ..appendVar(
+                name: 'condition', currentValue: false, resetValue: false)
+            ..appendVar(name: 'etapa', currentValue: 0, resetValue: 0),
           child: Scaffold(
             body: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -44,9 +45,96 @@ class Screen2Bloc extends StatelessWidget {
 class Screen2Body extends StatelessWidget {
   const Screen2Body({Key? key}) : super(key: key);
 
+  int getNextNodeForGrafcet(Variables variables) {
+    int etapa = variables.getValue('etapa');
+    switch (etapa) {
+      case 0:
+        return 1;
+      case 1:
+        return 4;
+    }
+
+    return 0;
+  }
+
+  int getNextNodeForFlowDiagram(Variables variables, int currentNodeIndex) {
+    int nextNodeIndex = 0;
+    switch (currentNodeIndex) {
+      case 5:
+        nextNodeIndex = 2;
+        break;
+      case 2:
+        nextNodeIndex = 3;
+        break;
+      case 3:
+        nextNodeIndex = 4;
+        break;
+      case 4:
+        nextNodeIndex = 6;
+        break;
+      case 6: //void Loop
+        nextNodeIndex = 7;
+
+        break;
+      case 7: //Entradas
+        nextNodeIndex = 8;
+        break;
+      case 8:
+        if (variables.getValue('etapa') == 0) {
+          nextNodeIndex = 9;
+        } else {
+          nextNodeIndex = 14;
+        }
+        break;
+      case 9:
+        nextNodeIndex = 10;
+        break;
+      case 10:
+        nextNodeIndex = 11;
+        break;
+      case 11:
+        if (variables.getValue('condition')) {
+          nextNodeIndex = 12;
+        } else {
+          nextNodeIndex = 13;
+        }
+        break;
+      case 12:
+        nextNodeIndex = 20;
+        break;
+      case 13:
+        nextNodeIndex = 19;
+        break;
+      case 14:
+        nextNodeIndex = 15;
+        break;
+      case 15:
+        nextNodeIndex = 19;
+        break;
+      case 17:
+        nextNodeIndex = 18;
+        break;
+      case 18:
+        nextNodeIndex = 19;
+        break;
+      case 19: //Salidas
+        nextNodeIndex = 21;
+        break;
+      case 20: //Etapa=1
+        variables.setValue('etapa', 1);
+        nextNodeIndex = 13;
+        break;
+      case 21: //Fin
+        nextNodeIndex = 6;
+        break;
+    }
+    return nextNodeIndex;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final vars = context.read<Variables>().list;
+    final vars = context.read<Variables>();
+    final variables = context.read<Variables>();
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -59,21 +147,119 @@ class Screen2Body extends StatelessWidget {
         ),
         Row(
           children: [
-            // Image.asset(
-            //   'assets/images/generalidades_grafcet.png',
-            // ),
-            const _DiagramaGraph(),
+            Diagram(
+              graphmlFile: 'assets/xml/generalidades_grafcet.graphml',
+              getNextNodeIndex: (_) {
+                return getNextNodeForGrafcet(variables);
+              },
+              imageFile: 'assets/images/generalidades_grafcet.png',
+              imageSize: const Size(788, 540),
+              cpuIndicatorType: CPUIndicatorType.robot,
+              initialNodeIndex: 1,
+              scale: 2.0,
+            ),
             Container(
               color: Colors.black,
               width: 10,
               height: 500,
             ),
-            const _DiagramaArd(),
+            Diagram(
+              graphmlFile: 'assets/xml/generalidades_grafcet_ard.graphml',
+              getNextNodeIndex: (currentNodeIndex) {
+                return getNextNodeForFlowDiagram(variables, currentNodeIndex);
+              },
+              imageFile: 'assets/images/generalidades_grafcet_ard.png',
+              imageSize: const Size(887, 781),
+              cpuIndicatorType: CPUIndicatorType.arrow,
+              initialNodeIndex: 5,
+              scale: 1.25,
+            ),
           ],
         ),
         ButtonCondition(vars: vars)
       ],
     );
+  }
+}
+
+class Diagram extends StatefulWidget {
+  final String graphmlFile;
+  final String imageFile;
+  final Size imageSize;
+  final double scale;
+  final int Function(int currentNodeIndex) getNextNodeIndex;
+  final CPUIndicatorType cpuIndicatorType;
+  final int initialNodeIndex;
+
+  const Diagram({
+    Key? key,
+    required this.graphmlFile,
+    this.scale = 1.0,
+    required this.getNextNodeIndex,
+    required this.imageFile,
+    this.cpuIndicatorType = CPUIndicatorType.arrow,
+    required this.imageSize,
+    this.initialNodeIndex = 0,
+  }) : super(key: key);
+
+  @override
+  _DiagramState createState() => _DiagramState();
+}
+
+class _DiagramState extends State<Diagram> {
+  FlowDiagram? flowChart;
+  late int currentNodeIndex;
+  bool resetPath = false;
+
+  _DiagramState();
+  void _loadXML() async {
+    XmlDocument xmlDocument =
+        XmlDocument.parse(await rootBundle.loadString(widget.graphmlFile));
+    flowChart = parseDiagram(xmlDocument, scale: widget.scale);
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    _loadXML();
+    currentNodeIndex = widget.initialNodeIndex;
+    super.initState();
+  }
+
+  NodeFlowDiagram? getNextNode() {
+    //print(widget.getNextNodeIndex());
+    currentNodeIndex = widget.getNextNodeIndex(currentNodeIndex);
+    return flowChart?.nodes[currentNodeIndex];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final imagen = Image.asset(widget.imageFile);
+
+    return BlocListener<TimerBloc, TimerState>(
+        listener: (previous, current) {
+          if (current is TimerInitial) {
+            currentNodeIndex = widget.initialNodeIndex;
+            resetPath = true;
+            setState(() {});
+            context.read<Variables>().resetVars();
+          } else if (resetPath && current is TimerRunInProgress) {
+            resetPath = false;
+            setState(() {});
+          }
+        },
+        child: Stack(
+          children: [
+            imagen,
+            CPUIndicator(
+              width: widget.imageSize.width,
+              height: widget.imageSize.height,
+              getNextNode: getNextNode,
+              cpuIndicatorType: widget.cpuIndicatorType,
+              resetPath: resetPath,
+            )
+          ],
+        ));
   }
 }
 
@@ -83,7 +269,7 @@ class ButtonCondition extends StatefulWidget {
     required this.vars,
   }) : super(key: key);
 
-  final Map<String, dynamic> vars;
+  final Variables vars;
 
   @override
   State<ButtonCondition> createState() => _ButtonConditionState();
@@ -94,14 +280,16 @@ class _ButtonConditionState extends State<ButtonCondition> {
   Widget build(BuildContext context) {
     return ElevatedButton(
         onPressed: () {
-          widget.vars['condition'] = !widget.vars['condition'];
+          widget.vars.setValue('condition', !widget.vars.getValue('condition'));
           setState(() {});
         },
         style: ElevatedButton.styleFrom(
             textStyle:
                 Theme.of(context).textTheme.button!.copyWith(fontSize: 40),
-            primary: widget.vars['condition'] ? Colors.green[500] : Colors.red),
-        child: Text('Condicion = ${widget.vars['condition']}'));
+            primary: widget.vars.getValue('condition')
+                ? Colors.green[500]
+                : Colors.red),
+        child: Text('Condicion = ${widget.vars.getValue('condition')}'));
   }
 }
 
@@ -130,7 +318,7 @@ class __DiagramaGraphState extends State<_DiagramaGraph> {
   }
 
   NodeFlowDiagram? getNextNode() {
-    switch (context.read<Variables>().list['etapa']) {
+    switch (context.read<Variables>().getValue('etapa')) {
       case 0:
         currentNodeIndex = 1;
         break;
@@ -148,12 +336,11 @@ class __DiagramaGraphState extends State<_DiagramaGraph> {
     return BlocListener<TimerBloc, TimerState>(
         listener: (previous, current) {
           if (current is TimerInitial) {
-            currentNodeIndex = 5;
+            currentNodeIndex = 0;
             resetPath = true;
             setState(() {});
-            context.read<Variables>().list['condition'] = false;
-            context.read<Variables>().list['etapa'] = 0;
-          } else if (current is TimerRunInProgress) {
+            context.read<Variables>().resetVars();
+          } else if (resetPath && current is TimerRunInProgress) {
             resetPath = false;
             setState(() {});
           }
@@ -162,8 +349,8 @@ class __DiagramaGraphState extends State<_DiagramaGraph> {
           children: [
             imagen,
             CPUIndicator(
-              width: 887,
-              height: 781,
+              width: 788,
+              height: 540,
               getNextNode: getNextNode,
               cpuIndicatorType: CPUIndicatorType.robot,
               resetPath: resetPath,
@@ -220,7 +407,7 @@ class __DiagramaArdState extends State<_DiagramaArd> {
           currentNodeIndex = 8;
           break;
         case 8:
-          if (context.read<Variables>().list["etapa"] == 0) {
+          if (context.read<Variables>().getValue('etapa') == 0) {
             currentNodeIndex = 9;
           } else {
             currentNodeIndex = 14;
@@ -233,7 +420,7 @@ class __DiagramaArdState extends State<_DiagramaArd> {
           currentNodeIndex = 11;
           break;
         case 11:
-          if (context.read<Variables>().list["condition"]) {
+          if (context.read<Variables>().getValue('condition')) {
             currentNodeIndex = 12;
           } else {
             currentNodeIndex = 13;
@@ -261,7 +448,7 @@ class __DiagramaArdState extends State<_DiagramaArd> {
           currentNodeIndex = 21;
           break;
         case 20: //Etapa=1
-          context.read<Variables>().list["etapa"] = 1;
+          context.read<Variables>().setValue('etapa', 1);
           currentNodeIndex = 13;
           break;
         case 21: //Fin
@@ -281,8 +468,7 @@ class __DiagramaArdState extends State<_DiagramaArd> {
             currentNodeIndex = 5;
             resetPath = true;
             setState(() {});
-            context.read<Variables>().list['condition'] = false;
-            context.read<Variables>().list['etapa'] = 0;
+            context.read<Variables>().resetVars();
           } else if (resetPath && current is TimerRunInProgress) {
             resetPath = false;
             setState(() {});
