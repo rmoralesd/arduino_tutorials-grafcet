@@ -67,7 +67,9 @@ class _DiagramState extends State<Diagram> {
             currentNodeIndex = widget.initialNodeIndex;
             resetPath = true;
             setState(() {});
-            context.read<Variables>().resetVars();
+            try {
+              context.read<Variables>().resetVars();
+            } catch (_) {}
           } else if (resetPath && current is TimerRunInProgress) {
             resetPath = false;
             setState(() {});

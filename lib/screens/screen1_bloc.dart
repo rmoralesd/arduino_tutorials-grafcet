@@ -4,6 +4,7 @@ import 'package:grafcet/blocs/timer_bloc/timer_bloc.dart';
 import 'package:grafcet/models/ticker.dart';
 import 'package:grafcet/widgets/controls.dart';
 import 'package:grafcet/widgets/diagrama_general_widget.dart';
+import 'package:grafcet/widgets/widgets.dart';
 
 class Screen1Bloc extends StatelessWidget {
   const Screen1Bloc({Key? key}) : super(key: key);
@@ -41,6 +42,14 @@ class Screen1Body extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
+  int getNextnode(int currentNodeIndex) {
+    int nextNode = currentNodeIndex + 1;
+    if (nextNode == 9) {
+      nextNode = 4;
+    }
+    return nextNode;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -59,7 +68,16 @@ class Screen1Body extends StatelessWidget {
             const SizedBox(
               height: 10,
             ),
-            const DiagramaGeneral()
+            //const DiagramaGeneral()
+            Diagram(
+              graphmlFile: 'assets/xml/diagram_general.graphml',
+              getNextNodeIndex: (currentNodeIndex) =>
+                  getNextnode(currentNodeIndex),
+              imageFile: 'assets/images/diagrama_general.png',
+              imageSize: const Size(1312, 692),
+              scale: 2,
+              initialNodeIndex: -1,
+            )
           ],
         )
       ],
