@@ -57,6 +57,9 @@ class Screen2Body extends StatelessWidget {
   int getNextNodeForFlowDiagram(Variables variables, int currentNodeIndex) {
     int nextNodeIndex = 0;
     switch (currentNodeIndex) {
+      case -1:
+        nextNodeIndex = 5;
+        break;
       case 5:
         nextNodeIndex = 2;
         break;
@@ -168,7 +171,7 @@ class Screen2Body extends StatelessWidget {
               imageFile: 'assets/images/generalidades_grafcet_ard.png',
               imageSize: const Size(887, 781),
               cpuIndicatorType: CPUIndicatorType.arrow,
-              initialNodeIndex: 5,
+              initialNodeIndex: -1,
               scale: 1.25,
             ),
           ],
