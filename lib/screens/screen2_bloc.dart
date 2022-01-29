@@ -115,6 +115,7 @@ class _DiagramaGraph extends StatefulWidget {
 class __DiagramaGraphState extends State<_DiagramaGraph> {
   FlowDiagram? flowChart;
   int currentNodeIndex = 1;
+  bool resetPath = false;
   void _loadXML() async {
     XmlDocument xmlDocument = XmlDocument.parse(await rootBundle
         .loadString('assets/xml/generalidades_grafcet.graphml'));
@@ -142,21 +143,30 @@ class __DiagramaGraphState extends State<_DiagramaGraph> {
 
   @override
   Widget build(BuildContext context) {
+    final imagen = Image.asset('assets/images/generalidades_grafcet.png');
+
     return BlocListener<TimerBloc, TimerState>(
         listener: (previous, current) {
           if (current is TimerInitial) {
             currentNodeIndex = 5;
+            resetPath = true;
             setState(() {});
             context.read<Variables>().list['condition'] = false;
             context.read<Variables>().list['etapa'] = 0;
+          } else if (current is TimerRunInProgress) {
+            resetPath = false;
+            setState(() {});
           }
         },
         child: Stack(
           children: [
-            Image.asset('assets/images/generalidades_grafcet.png'),
+            imagen,
             CPUIndicator(
+              width: 887,
+              height: 781,
               getNextNode: getNextNode,
               cpuIndicatorType: CPUIndicatorType.robot,
+              resetPath: resetPath,
             )
           ],
         ));
@@ -173,6 +183,7 @@ class _DiagramaArd extends StatefulWidget {
 class __DiagramaArdState extends State<_DiagramaArd> {
   FlowDiagram? flowChart;
   int currentNodeIndex = 5;
+  bool resetPath = true;
   void _loadXML() async {
     XmlDocument xmlDocument = XmlDocument.parse(await rootBundle
         .loadString('assets/xml/generalidades_grafcet_ard.graphml'));
@@ -268,15 +279,22 @@ class __DiagramaArdState extends State<_DiagramaArd> {
         listener: (previous, current) {
           if (current is TimerInitial) {
             currentNodeIndex = 5;
+            resetPath = true;
             setState(() {});
             context.read<Variables>().list['condition'] = false;
             context.read<Variables>().list['etapa'] = 0;
+          } else if (resetPath && current is TimerRunInProgress) {
+            resetPath = false;
+            setState(() {});
           }
         },
         child: Stack(
           children: [
             Image.asset('assets/images/generalidades_grafcet_ard.png'),
             CPUIndicator(
+              width: 887,
+              height: 781,
+              resetPath: resetPath,
               getNextNode: getNextNode,
             )
           ],
