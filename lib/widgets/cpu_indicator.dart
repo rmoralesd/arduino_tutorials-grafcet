@@ -41,13 +41,14 @@ class CPUIndicatorState extends State<CPUIndicator> {
       return const CircularProgressIndicator();
     }
     final offsetX =
-        (widget.cpuIndicatorType == CPUIndicatorType.arrow) ? 25 : 0;
+        (widget.cpuIndicatorType == CPUIndicatorType.arrow) ? 25 : 50;
     if (widget.resetPath) {
       points.clear();
     } else {
       (widget.cpuIndicatorType == CPUIndicatorType.arrow)
           ? points.add(Offset(node.x + node.width / 2, node.y + node.height))
-          : points.add(Offset(node.x, node.y + node.height));
+          : points
+              .add(Offset((node.x + node.width / 2), node.y + node.height / 2));
       if (points.length > 4) points.removeAt(0);
     }
 

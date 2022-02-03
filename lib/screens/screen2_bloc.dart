@@ -29,7 +29,7 @@ class Screen2Bloc extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 ControlsBar(
-                    onGoNext: () => Navigator.pushNamed(context, 'screen2'),
+                    onGoNext: () => Navigator.pushNamed(context, 'screen3'),
                     onGoPrevious: () => Navigator.pop(context)),
                 const Screen2Body(),
               ],

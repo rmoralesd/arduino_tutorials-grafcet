@@ -34,7 +34,7 @@ class Screen3 extends StatelessWidget {
               ),
               ControlsBar(
                 onGoNext: () {},
-                onGoPrevious: () {},
+                onGoPrevious: () => Navigator.pop(context),
               ),
               const _Screen3Body()
             ],
