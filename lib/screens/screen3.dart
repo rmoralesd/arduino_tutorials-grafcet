@@ -63,9 +63,8 @@ class _Screen3Body extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            const _BlinkCircuit(
-              ledState: true,
-            ),
+            _BlinkCircuit(
+                ledState: context.read<Variables>().getValue('ledState')),
             Diagram(
               graphmlFile: 'assets/xml/circuit1/grafcet1.graphml',
               getNextNodeIndex: (_) {
@@ -118,6 +117,7 @@ class _Screen3Body extends StatelessWidget {
                     vars.setValue('ledState', true);
                     vars.setValue('tInicio',
                         context.read<TimerBloc>().state.currentMilliseconds);
+
                     return 9;
                   case 9:
                     vars.setValue('etapa', 1);
@@ -132,8 +132,8 @@ class _Screen3Body extends StatelessWidget {
 
                     return 12;
                   case 12:
-                    print(vars.getValue('tiempo'));
-                    if (vars.getValue('tiempo') >= 100) {
+                    //print(vars.getValue('tiempo'));
+                    if (vars.getValue('tiempo') >= 10) {
                       return 14;
                     } else {
                       return 13;
@@ -163,8 +163,8 @@ class _Screen3Body extends StatelessWidget {
 
                     return 20;
                   case 20:
-                    print(vars.getValue('tiempo'));
-                    if (vars.getValue('tiempo') >= 100) {
+                    //print(vars.getValue('tiempo'));
+                    if (vars.getValue('tiempo') >= 10) {
                       return 22;
                     } else {
                       return 21;
@@ -208,13 +208,15 @@ class _BlinkCircuit extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.select((TimerBloc bloc) => bloc.state.currentMilliseconds);
+    final led = context.read<Variables>().getValue('ledState') as bool;
     return Stack(
       children: [
         Image.asset(
           'assets/images/circuit1/circuit.png',
           scale: 3,
         ),
-        if (ledState)
+        if (led)
           Positioned(
             child: Image.asset(
               'assets/images/circuit1/diodeLedOn.png',
@@ -223,7 +225,7 @@ class _BlinkCircuit extends StatelessWidget {
             top: 0,
             left: 102,
           ),
-        if (ledState)
+        if (led)
           Positioned(
             child: Image.asset(
               'assets/images/circuit1/internalLedOn.png',
