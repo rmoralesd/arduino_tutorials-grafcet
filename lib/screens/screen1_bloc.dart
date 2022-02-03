@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:grafcet/blocs/timer_bloc/timer_bloc.dart';
 import 'package:grafcet/models/ticker.dart';
 import 'package:grafcet/widgets/controls.dart';
-import 'package:grafcet/widgets/diagrama_general_widget.dart';
 import 'package:grafcet/widgets/widgets.dart';
 
 class Screen1Bloc extends StatelessWidget {
