@@ -1,11 +1,21 @@
 class Variables {
   final Map<String, dynamic> list = {};
 
-  void appendVar(
-      {required String name,
-      required dynamic currentValue,
-      required dynamic resetValue}) {
-    list[name] = {'currentValue': currentValue, 'resetValue': resetValue};
+  void appendVar({
+    required String name,
+    required dynamic currentValue,
+    required dynamic resetValue,
+    String type = 'unkown',
+  }) {
+    list[name] = {
+      'currentValue': currentValue,
+      'resetValue': resetValue,
+      'type': type
+    };
+  }
+
+  String getType(String name) {
+    return list[name]['type'];
   }
 
   dynamic getValue(String name) {

@@ -20,10 +20,23 @@ class Screen3 extends StatelessWidget {
       ],
       child: Provider<Variables>(
         create: (_) => Variables()
-          ..appendVar(name: 'etapa', currentValue: 0, resetValue: 0)
-          ..appendVar(name: 'ledState', currentValue: false, resetValue: false)
-          ..appendVar(name: 'tInicio', currentValue: 0, resetValue: 0)
-          ..appendVar(name: 'tiempo', currentValue: 0, resetValue: 0),
+          ..appendVar(
+              name: 'etapa', currentValue: 0, resetValue: 0, type: 'byte')
+          ..appendVar(
+              name: 'ledState',
+              currentValue: false,
+              resetValue: false,
+              type: 'bool')
+          ..appendVar(
+              name: 'tInicio',
+              currentValue: 0,
+              resetValue: 0,
+              type: 'unsigned long')
+          ..appendVar(
+              name: 'tiempo',
+              currentValue: 0,
+              resetValue: 0,
+              type: 'unsigned long'),
         child: Scaffold(
           body: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -63,8 +76,13 @@ class _Screen3Body extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _BlinkCircuit(
-                ledState: context.read<Variables>().getValue('ledState')),
+            Column(
+              children: [
+                _BlinkCircuit(
+                    ledState: context.read<Variables>().getValue('ledState')),
+                const _VarsTable(),
+              ],
+            ),
             Diagram(
               graphmlFile: 'assets/xml/circuit1/grafcet1.graphml',
               getNextNodeIndex: (_) {
@@ -90,6 +108,7 @@ class _Screen3Body extends StatelessWidget {
               graphmlFile: 'assets/xml/circuit1/flowChart.graphml',
               getNextNodeIndex: (currentNodeIndex) {
                 final vars = context.read<Variables>();
+                const timeScale = 20;
                 switch (currentNodeIndex) {
                   case -1:
                     return 0;
@@ -115,8 +134,13 @@ class _Screen3Body extends StatelessWidget {
                     return 8;
                   case 8:
                     vars.setValue('ledState', true);
-                    vars.setValue('tInicio',
-                        context.read<TimerBloc>().state.currentMilliseconds);
+                    vars.setValue(
+                        'tInicio',
+                        timeScale *
+                            context
+                                .read<TimerBloc>()
+                                .state
+                                .currentMilliseconds);
 
                     return 9;
                   case 9:
@@ -127,13 +151,17 @@ class _Screen3Body extends StatelessWidget {
                   case 11:
                     vars.setValue(
                         'tiempo',
-                        context.read<TimerBloc>().state.currentMilliseconds -
+                        timeScale *
+                                context
+                                    .read<TimerBloc>()
+                                    .state
+                                    .currentMilliseconds -
                             vars.getValue('tInicio'));
 
                     return 12;
                   case 12:
                     //print(vars.getValue('tiempo'));
-                    if (vars.getValue('tiempo') >= 10) {
+                    if (vars.getValue('tiempo') >= 1000) {
                       return 14;
                     } else {
                       return 13;
@@ -147,8 +175,13 @@ class _Screen3Body extends StatelessWidget {
                     return 16;
                   case 16:
                     vars.setValue('ledState', false);
-                    vars.setValue('tInicio',
-                        context.read<TimerBloc>().state.currentMilliseconds);
+                    vars.setValue(
+                        'tInicio',
+                        timeScale *
+                            context
+                                .read<TimerBloc>()
+                                .state
+                                .currentMilliseconds);
                     return 17;
                   case 17:
                     vars.setValue('etapa', 3);
@@ -158,13 +191,17 @@ class _Screen3Body extends StatelessWidget {
                   case 19:
                     vars.setValue(
                         'tiempo',
-                        context.read<TimerBloc>().state.currentMilliseconds -
+                        timeScale *
+                                context
+                                    .read<TimerBloc>()
+                                    .state
+                                    .currentMilliseconds -
                             vars.getValue('tInicio'));
 
                     return 20;
                   case 20:
                     //print(vars.getValue('tiempo'));
-                    if (vars.getValue('tiempo') >= 10) {
+                    if (vars.getValue('tiempo') >= 1000) {
                       return 22;
                     } else {
                       return 21;
@@ -195,6 +232,59 @@ class _Screen3Body extends StatelessWidget {
           ],
         )
       ],
+    );
+  }
+}
+
+class _VarsTable extends StatelessWidget {
+  const _VarsTable({Key? key}) : super(key: key);
+
+  Icon getIcon(String type) {
+    switch (type) {
+      case 'byte':
+        return const Icon(
+          Icons.circle,
+          size: 10,
+        );
+      case 'int':
+        return const Icon(
+          Icons.circle,
+          size: 20,
+        );
+      case 'bool':
+        return const Icon(Icons.check_circle);
+      default:
+        return const Icon(Icons.all_inclusive_rounded);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    context.select((TimerBloc bloc) => bloc.state.currentMilliseconds);
+    final vars = context.read<Variables>();
+    final List<Widget> listVars = [];
+    for (var element in vars.list.keys) {
+      listVars.add(ListTile(
+        leading: getIcon(vars.getType(element)),
+        tileColor: Colors.grey,
+        title: Row(
+          children: [
+            Text(vars.getType(element), style: const TextStyle(fontSize: 22)),
+            Text(' $element', style: const TextStyle(fontSize: 22))
+          ],
+        ),
+        trailing: Text(vars.getValue(element).toString(),
+            style: const TextStyle(fontSize: 22)),
+        dense: true,
+      ));
+    }
+
+    return Container(
+      width: 400,
+      height: 200,
+      child: ListView(
+        children: listVars,
+      ),
     );
   }
 }
