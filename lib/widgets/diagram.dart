@@ -15,6 +15,7 @@ class Diagram extends StatefulWidget {
   final int Function(int currentNodeIndex) getNextNodeIndex;
   final CPUIndicatorType cpuIndicatorType;
   final int initialNodeIndex;
+  final bool showNodesId;
 
   const Diagram({
     Key? key,
@@ -25,6 +26,7 @@ class Diagram extends StatefulWidget {
     this.cpuIndicatorType = CPUIndicatorType.arrow,
     required this.imageSize,
     this.initialNodeIndex = 0,
+    this.showNodesId = false,
   }) : super(key: key);
 
   @override
@@ -60,15 +62,17 @@ class _DiagramState extends State<Diagram> {
   @override
   Widget build(BuildContext context) {
     final imagen = Image.asset(widget.imageFile);
-    final labels = flowChart?.nodes
-        .expand((nodo) => {
-              Positioned(
-                child: Text(nodo.id),
-                left: nodo.x,
-                top: nodo.y,
-              )
-            })
-        .toList();
+    final labels = widget.showNodesId
+        ? flowChart?.nodes
+            .expand((nodo) => {
+                  Positioned(
+                    child: Text(nodo.id),
+                    left: nodo.x,
+                    top: nodo.y,
+                  )
+                })
+            .toList()
+        : [];
 
     return BlocListener<TimerBloc, TimerState>(
         listener: (previous, current) {
@@ -94,7 +98,7 @@ class _DiagramState extends State<Diagram> {
               cpuIndicatorType: widget.cpuIndicatorType,
               resetPath: resetPath,
             ),
-            if (labels != null) ...labels
+            if (widget.showNodesId && labels != null) ...labels
           ],
         ));
   }
