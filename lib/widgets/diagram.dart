@@ -60,6 +60,15 @@ class _DiagramState extends State<Diagram> {
   @override
   Widget build(BuildContext context) {
     final imagen = Image.asset(widget.imageFile);
+    final labels = flowChart?.nodes
+        .expand((nodo) => {
+              Positioned(
+                child: Text(nodo.id),
+                left: nodo.x,
+                top: nodo.y,
+              )
+            })
+        .toList();
 
     return BlocListener<TimerBloc, TimerState>(
         listener: (previous, current) {
@@ -84,7 +93,8 @@ class _DiagramState extends State<Diagram> {
               getNextNode: getNextNode,
               cpuIndicatorType: widget.cpuIndicatorType,
               resetPath: resetPath,
-            )
+            ),
+            if (labels != null) ...labels
           ],
         ));
   }
