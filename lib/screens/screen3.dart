@@ -63,6 +63,7 @@ class _Screen3Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const timeScale = 21;
     return Column(
       children: [
         Text(
@@ -79,7 +80,9 @@ class _Screen3Body extends StatelessWidget {
             Column(
               children: [
                 _BlinkCircuit(
-                    ledState: context.read<Variables>().getValue('ledState')),
+                  ledState: context.read<Variables>().getValue('ledState'),
+                  timeScale: timeScale,
+                ),
                 const _VarsTable(),
               ],
             ),
@@ -108,7 +111,7 @@ class _Screen3Body extends StatelessWidget {
               graphmlFile: 'assets/xml/circuit1/flowChart.graphml',
               getNextNodeIndex: (currentNodeIndex) {
                 final vars = context.read<Variables>();
-                const timeScale = 20;
+
                 switch (currentNodeIndex) {
                   case -1:
                     return 0;
@@ -291,39 +294,51 @@ class _VarsTable extends StatelessWidget {
 
 class _BlinkCircuit extends StatelessWidget {
   final bool ledState;
+  final int timeScale;
   const _BlinkCircuit({
     Key? key,
     this.ledState = false,
+    this.timeScale = 1,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     context.select((TimerBloc bloc) => bloc.state.currentMilliseconds);
     final led = context.read<Variables>().getValue('ledState') as bool;
-    return Stack(
+    final millis =
+        context.read<TimerBloc>().state.currentMilliseconds * timeScale;
+    return Column(
       children: [
-        Image.asset(
-          'assets/images/circuit1/circuit.png',
-          scale: 3,
+        Stack(
+          children: [
+            Image.asset(
+              'assets/images/circuit1/circuit.png',
+              scale: 3,
+            ),
+            if (led)
+              Positioned(
+                child: Image.asset(
+                  'assets/images/circuit1/diodeLedOn.png',
+                  scale: 3,
+                ),
+                top: 0,
+                left: 102,
+              ),
+            if (led)
+              Positioned(
+                child: Image.asset(
+                  'assets/images/circuit1/internalLedOn.png',
+                  scale: 3,
+                ),
+                top: 122,
+                left: 105,
+              )
+          ],
         ),
-        if (led)
-          Positioned(
-            child: Image.asset(
-              'assets/images/circuit1/diodeLedOn.png',
-              scale: 3,
-            ),
-            top: 0,
-            left: 102,
-          ),
-        if (led)
-          Positioned(
-            child: Image.asset(
-              'assets/images/circuit1/internalLedOn.png',
-              scale: 3,
-            ),
-            top: 122,
-            left: 105,
-          )
+        Text(
+          'millis()=$millis',
+          style: const TextStyle(fontSize: 28),
+        )
       ],
     );
   }
