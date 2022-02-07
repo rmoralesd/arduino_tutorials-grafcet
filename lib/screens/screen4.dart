@@ -7,8 +7,8 @@ import 'package:grafcet/widgets/controls.dart';
 import 'package:grafcet/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
-class Screen3 extends StatelessWidget {
-  const Screen3({Key? key}) : super(key: key);
+class Screen4 extends StatelessWidget {
+  const Screen4({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,9 +24,9 @@ class Screen3 extends StatelessWidget {
               name: 'etapa', currentValue: 0, resetValue: 0, type: 'byte')
           ..appendVar(
               name: 'ledState',
-              currentValue: false,
-              resetValue: false,
-              type: 'bool')
+              currentValue: 'LOW',
+              resetValue: 'HIGH',
+              type: 'int')
           ..appendVar(
               name: 'tInicio',
               currentValue: 0,
@@ -49,7 +49,7 @@ class Screen3 extends StatelessWidget {
                 onGoNext: () {},
                 onGoPrevious: () => Navigator.pop(context),
               ),
-              const _Screen3Body()
+              const _Screen4Body()
             ],
           ),
         ),
@@ -58,8 +58,8 @@ class Screen3 extends StatelessWidget {
   }
 }
 
-class _Screen3Body extends StatelessWidget {
-  const _Screen3Body({Key? key}) : super(key: key);
+class _Screen4Body extends StatelessWidget {
+  const _Screen4Body({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -68,11 +68,11 @@ class _Screen3Body extends StatelessWidget {
       children: [
         Text(
           'Blink led con Grafcet',
-          style: Theme.of(context).textTheme.headline1,
+          style: Theme.of(context).textTheme.headline2,
         ),
         Text(
-          'Primera solución',
-          style: Theme.of(context).textTheme.headline2,
+          'Segunda solución',
+          style: Theme.of(context).textTheme.headline3,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -80,14 +80,15 @@ class _Screen3Body extends StatelessWidget {
             Column(
               children: [
                 _BlinkCircuit(
-                  ledState: context.read<Variables>().getValue('ledState'),
+                  ledState:
+                      context.read<Variables>().getValue('ledState') == 'HIGH',
                   timeScale: timeScale,
                 ),
                 const _VarsTable(),
               ],
             ),
             Diagram(
-              graphmlFile: 'assets/xml/circuit1/grafcet1.graphml',
+              graphmlFile: 'assets/xml/circuit1/grafcet2.graphml',
               getNextNodeIndex: (_) {
                 final etapa = context.read<Variables>().getValue('etapa');
                 switch (etapa) {
@@ -95,20 +96,17 @@ class _Screen3Body extends StatelessWidget {
                     return 0;
                   case 1:
                     return 2;
-                  case 2:
-                    return 5;
-                  case 3:
-                    return 10;
                 }
                 return 0;
               },
-              imageFile: 'assets/images/circuit1/grafcet1.png',
-              imageSize: const Size(387, 501),
+              imageFile: 'assets/images/circuit1/grafcet2.png',
+              imageSize: const Size(487, 284),
               cpuIndicatorType: CPUIndicatorType.robot,
-              scale: 1.25,
+              scale: 1.5,
+              showNodesId: false,
             ),
             Diagram(
-              graphmlFile: 'assets/xml/circuit1/flowChart.graphml',
+              graphmlFile: 'assets/xml/circuit1/flowChart2.graphml',
               getNextNodeIndex: (currentNodeIndex) {
                 final vars = context.read<Variables>();
 
@@ -121,63 +119,50 @@ class _Screen3Body extends StatelessWidget {
                     return 2;
                   case 2:
                     return 6;
-                  case 6:
-                    return 3;
+
                   case 3:
                     return 4;
                   case 4:
                     return 5;
                   case 5:
                     if (vars.getValue('etapa') == 0) return 7;
-                    if (vars.getValue('etapa') == 1) return 10;
-                    if (vars.getValue('etapa') == 2) return 15;
-                    if (vars.getValue('etapa') == 3) return 18;
+                    if (vars.getValue('etapa') == 1) return 17;
                     return 0;
+                  case 6:
+                    return 15;
                   case 7:
                     return 8;
                   case 8:
-                    vars.setValue('ledState', true);
+                    vars.setValue('ledState', 'HIGH');
                     vars.setValue(
-                        'tInicio',
+                        'tiempo',
                         timeScale *
-                            context
-                                .read<TimerBloc>()
-                                .state
-                                .currentMilliseconds);
+                                context
+                                    .read<TimerBloc>()
+                                    .state
+                                    .currentMilliseconds -
+                            vars.getValue('tInicio'));
 
                     return 9;
                   case 9:
-                    vars.setValue('etapa', 1);
-                    return 26;
-                  case 10:
-                    return 11;
-                  case 11:
-                    vars.setValue(
-                        'tiempo',
-                        timeScale *
-                                context
-                                    .read<TimerBloc>()
-                                    .state
-                                    .currentMilliseconds -
-                            vars.getValue('tInicio'));
-
-                    return 12;
-                  case 12:
-                    //print(vars.getValue('tiempo'));
                     if (vars.getValue('tiempo') >= 1000) {
-                      return 14;
+                      return 11;
                     } else {
-                      return 13;
+                      return 10;
                     }
-                  case 13:
-                    return 26;
-                  case 14:
-                    vars.setValue('etapa', 2);
-                    return 13;
-                  case 15:
+                  case 10:
+                    return 23;
+                  case 11:
+                    vars.setValue('etapa', 1);
                     return 16;
-                  case 16:
-                    vars.setValue('ledState', false);
+                  case 12:
+                    return 13;
+
+                  case 13:
+                    return 4;
+                  case 14:
+                    return 0;
+                  case 15:
                     vars.setValue(
                         'tInicio',
                         timeScale *
@@ -185,13 +170,20 @@ class _Screen3Body extends StatelessWidget {
                                 .read<TimerBloc>()
                                 .state
                                 .currentMilliseconds);
-                    return 17;
+                    return 3;
+                  case 16:
+                    vars.setValue(
+                        'tInicio',
+                        timeScale *
+                            context
+                                .read<TimerBloc>()
+                                .state
+                                .currentMilliseconds);
+                    return 10;
                   case 17:
-                    vars.setValue('etapa', 3);
-                    return 26;
+                    return 18;
                   case 18:
-                    return 19;
-                  case 19:
+                    vars.setValue('ledState', 'LOW');
                     vars.setValue(
                         'tiempo',
                         timeScale *
@@ -201,36 +193,41 @@ class _Screen3Body extends StatelessWidget {
                                     .currentMilliseconds -
                             vars.getValue('tInicio'));
 
-                    return 20;
+                    return 19;
+                  case 19:
+                    if (vars.getValue('tiempo') >= 1000) {
+                      return 21;
+                    } else {
+                      return 20;
+                    }
                   case 20:
                     //print(vars.getValue('tiempo'));
-                    if (vars.getValue('tiempo') >= 1000) {
-                      return 22;
-                    } else {
-                      return 21;
-                    }
-                  case 21:
-                    return 26;
-                  case 22:
-                    vars.setValue('etapa', 0);
-                    return 21;
-
-                  case 26:
                     return 23;
-                  case 23:
-                    return 24;
-                  case 24:
-                    return 4;
+                  case 21:
+                    vars.setValue('etapa', 0);
+                    return 22;
+                  case 22:
+                    vars.setValue(
+                        'tInicio',
+                        timeScale *
+                            context
+                                .read<TimerBloc>()
+                                .state
+                                .currentMilliseconds);
+                    return 20;
 
+                  case 23:
+                    return 12;
                   default:
                     return 0;
                 }
               },
-              imageFile: 'assets/images/circuit1/flowChart.png',
-              imageSize: const Size(996, 717),
+              imageFile: 'assets/images/circuit1/flowChart2.png',
+              imageSize: const Size(924, 864),
               cpuIndicatorType: CPUIndicatorType.arrow,
               initialNodeIndex: -1,
-              scale: 1.25,
+              scale: 1.5,
+              showNodesId: false,
             ),
           ],
         )
@@ -251,7 +248,7 @@ class _VarsTable extends StatelessWidget {
         );
       case 'int':
         return const Icon(
-          Icons.circle,
+          Icons.looks_one_outlined,
           size: 20,
         );
       case 'bool':
@@ -304,7 +301,7 @@ class _BlinkCircuit extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     context.select((TimerBloc bloc) => bloc.state.currentMilliseconds);
-    final led = context.read<Variables>().getValue('ledState') as bool;
+    final led = context.read<Variables>().getValue('ledState') == 'HIGH';
     final millis =
         context.read<TimerBloc>().state.currentMilliseconds * timeScale;
     return Column(
