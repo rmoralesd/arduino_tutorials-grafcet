@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Tutorial Grafcet',
-      initialRoute: 'screen4',
+      initialRoute: 'screen1',
       routes: appRoutes,
     );
   }

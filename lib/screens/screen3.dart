@@ -24,9 +24,9 @@ class Screen3 extends StatelessWidget {
               name: 'etapa', currentValue: 0, resetValue: 0, type: 'byte')
           ..appendVar(
               name: 'ledState',
-              currentValue: false,
-              resetValue: false,
-              type: 'bool')
+              currentValue: 'LOW',
+              resetValue: 'HIGH',
+              type: 'int')
           ..appendVar(
               name: 'tInicio',
               currentValue: 0,
@@ -46,7 +46,7 @@ class Screen3 extends StatelessWidget {
                 width: double.infinity,
               ),
               ControlsBar(
-                onGoNext: () {},
+                onGoNext: () => Navigator.pushNamed(context, 'screen4'),
                 onGoPrevious: () => Navigator.pop(context),
               ),
               const _Screen3Body()
@@ -79,11 +79,13 @@ class _Screen3Body extends StatelessWidget {
           children: [
             Column(
               children: [
-                _BlinkCircuit(
-                  ledState: context.read<Variables>().getValue('ledState'),
+                BlinkCircuit(
+                  ledState:
+                      context.read<Variables>().getValue('ledState') == 'HIGH',
                   timeScale: timeScale,
                 ),
-                const _VarsTable(),
+                //const _VarsTable(),
+                const VarsTable()
               ],
             ),
             Diagram(
@@ -136,7 +138,7 @@ class _Screen3Body extends StatelessWidget {
                   case 7:
                     return 8;
                   case 8:
-                    vars.setValue('ledState', true);
+                    vars.setValue('ledState', 'HIGH');
                     vars.setValue(
                         'tInicio',
                         timeScale *
@@ -177,7 +179,7 @@ class _Screen3Body extends StatelessWidget {
                   case 15:
                     return 16;
                   case 16:
-                    vars.setValue('ledState', false);
+                    vars.setValue('ledState', 'LOW');
                     vars.setValue(
                         'tInicio',
                         timeScale *
@@ -233,111 +235,6 @@ class _Screen3Body extends StatelessWidget {
               scale: 1.25,
             ),
           ],
-        )
-      ],
-    );
-  }
-}
-
-class _VarsTable extends StatelessWidget {
-  const _VarsTable({Key? key}) : super(key: key);
-
-  Icon getIcon(String type) {
-    switch (type) {
-      case 'byte':
-        return const Icon(
-          Icons.circle,
-          size: 10,
-        );
-      case 'int':
-        return const Icon(
-          Icons.circle,
-          size: 20,
-        );
-      case 'bool':
-        return const Icon(Icons.check_circle);
-      default:
-        return const Icon(Icons.all_inclusive_rounded);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    context.select((TimerBloc bloc) => bloc.state.currentMilliseconds);
-    final vars = context.read<Variables>();
-    final List<Widget> listVars = [];
-    for (var element in vars.list.keys) {
-      listVars.add(ListTile(
-        leading: getIcon(vars.getType(element)),
-        tileColor: Colors.grey,
-        title: Row(
-          children: [
-            Text(vars.getType(element), style: const TextStyle(fontSize: 22)),
-            Text(' $element', style: const TextStyle(fontSize: 22))
-          ],
-        ),
-        trailing: Text(vars.getValue(element).toString(),
-            style: const TextStyle(fontSize: 22)),
-        dense: true,
-      ));
-    }
-
-    return SizedBox(
-      width: 400,
-      height: 200,
-      child: ListView(
-        children: listVars,
-      ),
-    );
-  }
-}
-
-class _BlinkCircuit extends StatelessWidget {
-  final bool ledState;
-  final int timeScale;
-  const _BlinkCircuit({
-    Key? key,
-    this.ledState = false,
-    this.timeScale = 1,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    context.select((TimerBloc bloc) => bloc.state.currentMilliseconds);
-    final led = context.read<Variables>().getValue('ledState') as bool;
-    final millis =
-        context.read<TimerBloc>().state.currentMilliseconds * timeScale;
-    return Column(
-      children: [
-        Stack(
-          children: [
-            Image.asset(
-              'assets/images/circuit1/circuit.png',
-              scale: 3,
-            ),
-            if (led)
-              Positioned(
-                child: Image.asset(
-                  'assets/images/circuit1/diodeLedOn.png',
-                  scale: 3,
-                ),
-                top: 0,
-                left: 102,
-              ),
-            if (led)
-              Positioned(
-                child: Image.asset(
-                  'assets/images/circuit1/internalLedOn.png',
-                  scale: 3,
-                ),
-                top: 122,
-                left: 105,
-              )
-          ],
-        ),
-        Text(
-          'millis()=$millis',
-          style: const TextStyle(fontSize: 28),
         )
       ],
     );
